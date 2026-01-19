@@ -3,10 +3,30 @@ import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 console.log("WebLLM loaded successfully!");
 const messages = [
   {
-    content: `You are a translator. It's your role to translate user input.
-If the input is in Japanese, translate it to English.
-If the input is in English, translate it to Japanese.
-If source code is included, keep the code as-is and only translate the surrounding text.`,
+    content: `You are a translator (English ↔︎ Japanese).
+
+Rules:
+1. If input is Japanese: Translate to English
+2. If input is English: Translate to Japanese
+3. Keep all code blocks (\`\`\`) exactly as-is
+4. Keep inline code (\`text\`) exactly as-is
+5. Translate only narrative text to natural Japanese
+6. Preserve markdown formatting
+
+Examples:
+  Input: "Create a \`config.py\` file."
+  Output: "\`config.py\`ファイルを作成します。"
+
+  Input: "## Installation\n\`\`\`bash\nnpm install\n\`\`\`"
+  Output: "## インストール\n\`\`\`bash\nnpm install\n\`\`\`"
+
+  Input: "\`config.py\`ファイルを作成します。"
+  Output:  "Create a \`config.py\` file."
+
+  Input: "## インストール\n\`\`\`bash\nnpm install\n\`\`\`"
+  Output: "## Installation\n\`\`\`bash\nnpm install\n\`\`\`"
+
+Provide only the translation for the given input.`,
     role: "system",
   },
 ];
@@ -51,6 +71,9 @@ async function initializeWebLLMEngine() {
     document.getElementById("send").disabled = false;
     document.getElementById("user-input").disabled = false;
     document.querySelector('.wrapper').classList.add('chat-active');
+
+    // Apply shared content if available
+    applySharedContent();
 
   } catch (error) {
     console.error("Error loading model:", error);
@@ -277,3 +300,45 @@ document.getElementById('reset-chat').addEventListener('click', () => {
   sendButton.disabled = false;
 });
 
+// Handle Share Target API - receive shared text from other apps
+function handleSharedContent() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const sharedText = urlParams.get('text');
+  const sharedTitle = urlParams.get('title');
+  const sharedUrl = urlParams.get('url');
+
+  // Combine shared content (prioritize text, then title, then url)
+  let content = sharedText || '';
+  if (sharedTitle && !content.includes(sharedTitle)) {
+    content = sharedTitle + (content ? '\n\n' + content : '');
+  }
+  if (sharedUrl && !content.includes(sharedUrl)) {
+    content = content + (content ? '\n\n' : '') + sharedUrl;
+  }
+
+  if (content) {
+    // Store shared content for later use
+    sessionStorage.setItem('sharedContent', content);
+
+    // Clean up URL (remove query params)
+    window.history.replaceState({}, document.title, window.location.pathname);
+
+    // Show notification that content was received
+    console.log('Received shared content:', content);
+  }
+}
+
+// Apply shared content after model is loaded
+function applySharedContent() {
+  const sharedContent = sessionStorage.getItem('sharedContent');
+  if (sharedContent) {
+    const userInput = document.getElementById("user-input");
+    userInput.value = sharedContent;
+    userInput.style.height = "24px";
+    userInput.style.height = userInput.scrollHeight + "px";
+    sessionStorage.removeItem('sharedContent');
+  }
+}
+
+// Check for shared content on page load
+handleSharedContent();

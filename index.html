@@ -4,11 +4,14 @@
     <title>WebLLM Translate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="UTF-8" />
+    <meta name="theme-color" content="#2b2b2b" />
+    <meta name="description" content="Browser-based translation powered by WebLLM" />
     <link rel="stylesheet" href="./index.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/logo.png">
-
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./assets/logo.png" />
   </head>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <body>
@@ -55,5 +58,18 @@
       </footer>
     </div>
     <script src="./index.js" type="module"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then((registration) => {
+              console.log('ServiceWorker registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('ServiceWorker registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
