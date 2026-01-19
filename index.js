@@ -63,17 +63,20 @@ async function initializeWebLLMEngine() {
 function setLoading(isLoading) {
   const sendButton = document.getElementById("send");
   const resetButton = document.getElementById("reset-chat");
+  const stopButton = document.getElementById("stop-generation");
   const spinner = sendButton.querySelector(".spinner");
   const buttonText = sendButton.querySelector(".button-text");
   const userInput = document.getElementById("user-input");
-  
+
   sendButton.disabled = isLoading;
   spinner.classList.toggle("hidden", !isLoading);
   buttonText.classList.toggle("hidden", isLoading);
 
   resetButton.disabled = isLoading;
   resetButton.style.opacity = isLoading ? "0.5" : "1";
-  
+
+  stopButton.classList.toggle("hidden", !isLoading);
+
   userInput.disabled = isLoading;
   userInput.setAttribute("placeholder", isLoading ? "生成中..." : "メッセージを入力してください。");
 }
@@ -220,6 +223,16 @@ textarea.addEventListener("input", () => {
 
 document.getElementById("download").addEventListener("click", initializeWebLLMEngine);
 document.getElementById("send").addEventListener("click", onMessageSend);
+document.getElementById("stop-generation").addEventListener("click", () => {
+  cancelGeneration();
+  // Remove incomplete assistant message from array
+  if (messages.length > 1 && messages[messages.length - 1].role === "assistant") {
+    messages.pop();
+  }
+  // Update last message in UI to show it was stopped
+  updateLastMessage("(中断されました)");
+  setLoading(false);
+});
 
 document.getElementById('title-link').addEventListener('click', (e) => {
   e.preventDefault();
