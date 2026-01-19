@@ -2,7 +2,7 @@
 
 Browser-based English ↔ Japanese translator powered by WebLLM. Runs entirely in your browser.
 
-![UI Screenshot](./assets/ui.png)
+![UI Screenshot](./assets/chat.png)
 
 ## Features
 
