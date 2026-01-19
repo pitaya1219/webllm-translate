@@ -56,7 +56,6 @@ async function initializeWebLLMEngine() {
     downloadProgress.style.display = "none";
     document.querySelector(".download-container").style.display = "none";
 
-    document.querySelector(".suggestions-container").style.display = "flex";
     document.querySelector(".chat-container").style.display = "flex";
     document.getElementById('reset-chat').style.display = 'flex';
     document.getElementById("send").disabled = false;
@@ -164,8 +163,6 @@ function onMessageSend() {
   const input = document.getElementById("user-input").value.trim();
   const message = { content: input, role: "user" };
   if (!input) return;
-  document.querySelector('.suggestions-container').style.display = 'none';
-  document.querySelector('.chat-container').classList.add('no-suggestions');
   setLoading(true);
   
   messages.push(message);
@@ -267,15 +264,6 @@ document.getElementById("user-input").addEventListener("keydown", (event) => {
 document.getElementById("download").addEventListener("click", initializeWebLLMEngine);
 document.getElementById("send").addEventListener("click", onMessageSend);
 
-document.querySelectorAll('.suggestion-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const input = document.getElementById('user-input');
-    input.value = btn.textContent;
-    onMessageSend();
-    document.querySelector('.suggestions-container').style.display = 'none';
-  });
-});
-
 document.getElementById('title-link').addEventListener('click', (e) => {
   e.preventDefault();
   if (document.querySelector('.chat-container').style.display === 'flex') {
@@ -285,7 +273,6 @@ document.getElementById('title-link').addEventListener('click', (e) => {
     document.getElementById('chat-box').innerHTML = '';
     
     document.querySelector('.chat-container').style.display = 'none';
-    document.querySelector('.suggestions-container').style.display = 'none';
     document.getElementById('reset-chat').style.display = 'none';
     
     const downloadContainer = document.querySelector('.download-container');
@@ -312,7 +299,6 @@ document.getElementById('reset-chat').addEventListener('click', () => {
     chatBox.removeChild(chatBox.firstChild);
   }
 
-  document.querySelector('.suggestions-container').style.display = 'flex';
   resetUIState();
 
   const userInput = document.getElementById("user-input");
@@ -321,83 +307,3 @@ document.getElementById('reset-chat').addEventListener('click', () => {
   sendButton.disabled = false;
 });
 
-const infoButton = document.getElementById('info-button');
-const modal = document.getElementById('info-modal');
-
-infoButton.addEventListener('click', () => {
-  modal.classList.remove('hidden');
-});
-
-modal.addEventListener('click', (e) => {
-  if (e.target === modal) {
-    modal.classList.add('hidden');
-  }
-});
-
-const closeModalButton = modal.querySelector('.close-modal');
-closeModalButton.addEventListener('click', () => {
-  modal.classList.add('hidden');
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  // Get existing elements
-  const header = document.querySelector('header');
-  const headerContent = header.querySelector('.header-content');
-  const logo = header.querySelector('.logo').parentElement;
-  const modelDescription = document.querySelector('.model-description');
-
-  // Create and setup header main
-  const headerMain = document.createElement('div');
-  headerMain.className = 'header-main';
-  
-  // Move elements to new structure
-  headerMain.appendChild(headerContent);
-  headerMain.appendChild(logo);
-  
-  // Clear and rebuild header
-  header.innerHTML = '';
-  header.appendChild(headerMain);
-  
-  if (modelDescription) {
-    header.appendChild(modelDescription);
-  }
-
-  // Create and add toggle button
-  const headerToggle = document.createElement('button');
-  headerToggle.className = 'header-toggle';
-  headerToggle.setAttribute('aria-label', '詳細の表示/非表示');
-  headerToggle.innerHTML = '<span class="toggle-icon"></span>';
-  
-  header.appendChild(headerToggle);
-
-  // Add click event
-  // Add initial collapsed state when chat is active
-  const setHeaderState = () => {
-    if (document.querySelector('.wrapper').classList.contains('chat-active')) {
-      header.classList.add('header-collapsed');
-    } else {
-      header.classList.remove('header-collapsed');
-    }
-  };
-
-  // Set initial state
-  setHeaderState();
-
-  // Add click event listener
-  headerToggle.addEventListener('click', () => {
-    header.classList.toggle('header-collapsed');
-  });
-
-  // Watch for chat-active class changes
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'class') {
-        setHeaderState();
-      }
-    });
-  });
-
-  observer.observe(document.querySelector('.wrapper'), {
-    attributes: true
-  });
-});
