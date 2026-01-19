@@ -222,44 +222,11 @@ function updateLastMessage(content) {
   });
 }
 
-let isComposing = false;
-
 const textarea = document.getElementById("user-input");
 textarea.addEventListener("input", () => {
   textarea.style.height = "24px";
   textarea.style.height = textarea.scrollHeight + "px";
 });
-
-textarea.addEventListener("compositionstart", () => {
-  isComposing = true;
-});
-
-textarea.addEventListener("compositionend", () => {
-  isComposing = false;
-});
-
-textarea.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey && !isComposing) {
-    event.preventDefault();
-    onMessageSend();
-  }
-});
-
-document.getElementById("user-input").addEventListener("compositionstart", () => {
-  isComposing = true;
-});
-
-document.getElementById("user-input").addEventListener("compositionend", () => {
-  isComposing = false;
-});
-
-document.getElementById("user-input").addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !isComposing) {
-    event.preventDefault();
-    onMessageSend();
-  }
-});
-
 
 document.getElementById("download").addEventListener("click", initializeWebLLMEngine);
 document.getElementById("send").addEventListener("click", onMessageSend);
