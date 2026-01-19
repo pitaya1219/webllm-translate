@@ -1,46 +1,17 @@
-import * as webllm from "https://esm.run/@mlc-ai/web-llm@0.2.48";
+import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
 console.log("WebLLM loaded successfully!");
 const messages = [
   {
-    content: `You are a translation assistant. Follow these rules:
-
-【Basic Rules】
-1. Japanese text → Translate to English
-2. Non-Japanese text (English, French, German, etc.) → Translate to Japanese
-3. If the user gives explicit instructions, follow them
-
-【Ambiguous Cases】
-If multiple languages are mixed and it's difficult to determine the primary language (e.g., similar proportions), ask the user which language to translate into.
-
-【Source Code】
-Do not translate source code. Keep it as-is. You may translate comments or strings within the code if needed.
-
-【Output Format】
-Format your response as follows:
-
-**Translation:**
-[Your translation here]
-
-**Notes:** (include only if there are supplementary explanations)
-[Any notes about nuance, context, alternative translations, etc.]`,
+    content: `You are a translator. It's your role to translate user input.
+If the input is in Japanese, translate it to English.
+If the input is in English, translate it to Japanese.
+If source code is included, keep the code as-is and only translate the surrounding text.`,
     role: "system",
   },
 ];
-const appConfig = {
-  model_list: [
-    {
-      model: "https://huggingface.co/SakanaAI/TinySwallow-1.5B-Instruct-q4f32_1-MLC",
-      model_id: "TinySwallow-1.5B",
-      model_lib:
-      // https://github.com/mlc-ai/binary-mlc-llm-libs/tree/main/web-llm-models/v0_2_48
-          webllm.modelLibURLPrefix +
-          webllm.modelVersion +
-          "/Qwen2-1.5B-Instruct-q4f32_1-ctx4k_cs1k-webgpu.wasm",
-    },
-  ],
-};
-console.log(appConfig);
+const MODEL_ID = "gemma-2-2b-jpn-it-q4f16_1-MLC";
+console.log("Using model:", MODEL_ID);
 // Callback function for initializing progress
 function updateProgress(report) {
   const progressBar = document.querySelector('.progress-fill');
@@ -65,8 +36,7 @@ async function initializeWebLLMEngine() {
     downloadStatus.style.display = "block";
     downloadProgress.style.display = "block";
     
-    engine = await webllm.CreateMLCEngine("TinySwallow-1.5B", {
-      appConfig: appConfig,
+    engine = await webllm.CreateMLCEngine(MODEL_ID, {
       initProgressCallback: updateEngineInitProgressCallback,
     });
     console.log("Model successfully loaded!");
