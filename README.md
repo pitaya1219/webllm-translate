@@ -2,6 +2,8 @@
 
 Browser-based English ↔ Japanese translator powered by WebLLM. Runs entirely in your browser.
 
+![UI Screenshot](./assets/ui.png)
+
 ## Features
 
 - **Browser-based** - No server required. All inference runs locally in your browser using WebGPU
