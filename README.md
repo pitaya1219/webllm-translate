@@ -1,54 +1,45 @@
-# TinySwallow ChatUI
-📚 [Paper](https://arxiv.org/abs/2501.16937) | 🤗 [Hugging Face](https://huggingface.co/collections/SakanaAI/tinyswallow-676cf5e57fff9075b5ddb7ec) | 📝 [Blog](https://sakana.ai/taid-jp)
+# WebLLM Translate
 
-<div align="center">
-<img alt="ui" src="./assets/ui.png" title="ui">
-</div>
+Browser-based English ↔ Japanese translator powered by WebLLM. Runs entirely in your browser.
 
-TinySwallow ChatUIは、ブラウザ上で動作するローカルな言語モデルチャットアプリケーションです。
+## Features
 
-**特徴:**
+- **Browser-based** - No server required. All inference runs locally in your browser using WebGPU
+- **Offline-capable** - Works offline after initial model download (PWA)
+- **Privacy-first** - Your data never leaves your device
+- **Android Share** - Receive shared text from other apps via Share Target API
 
-- 📱外部APIなどを介さず、最初のモデルのダウンロードが完了すれば完全オフラインで会話することも可能です。
-- 🔐 すべての処理がローカルで実行されるため、データが外部に送信されることはありません。
-- ⚡️ 複雑なセットアップ不要で、ブラウザから直接チャットを始めることができます。
+## Usage
 
-すぐにチャットを始めたい場合は、[こちら](https://pub.sakana.ai/tinyswallow/)からお試しください。なお、このデモにおいても、チャットはお使いのPCで動作され、データがSakana AIに送られることはありません。
-
-## 使い方
-
-### 1. リポジトリのクローン
+### Quick Start
 
 ```bash
-git clone https://github.com/SakanaAI/TinySwallow-ChatUI.git
-cd TinySwallow-ChatUI
-```
-
-### 2. HTTPサーバーを起動
-
-ターミナルを開き、HTTPサーバーを起動します。
-例えば、Pythonを用いる場合は以下のコマンドを実行します。
-
-```bash
+cd webllm-translate
 python -m http.server 8000
 ```
 
-⚠️ Windowsの場合、pythonを事前にインストールする必要があります。
+Open http://localhost:8000 in your browser.
 
-### 3. ブラウザでアクセス
+### Install as PWA
 
-任意のブラウザで以下のURLにアクセスします。
+On mobile (Android):
+1. Open the app in Chrome
+2. Tap "Add to Home Screen" from the browser menu
+3. The app can now receive shared text from other apps
 
-```
-http://localhost:8000
-```
+## Requirements
 
-## 完全なローカル実行が必要な場合
+- A browser with WebGPU support (Chrome 113+, Edge 113+)
+- Sufficient memory for model loading (~4GB)
 
-このTinySwallow ChatUIでは、最初のモデルダウンロード時に、ネットワークが必要です。
+## Model
 
-完全にローカル環境でモデルを実行したい場合は、[TinySwallow-ChatUI-Local](https://github.com/SakanaAI/TinySwallow-ChatUI-Local)をご利用ください。このレポジトリでは、モデルファイルも含まれており、ネットワークを必要なく、ローカルでチャットが可能です。
+This app uses [gemma-2-2b-jpn-it](https://huggingface.co/google/gemma-2-2b-jpn-it) via [WebLLM](https://webllm.mlc.ai/).
 
-## 利用上の注意
+## Acknowledgments
 
-本アプリケーションは実験段階のプロトタイプであり、研究開発の目的でのみ提供されています。商用利用や、障害が重大な影響を及ぼす可能性のある環境（ミッションクリティカルな環境）での使用には適していません。 本アプリケーションの使用は、利用者の自己責任で行われ、その性能や結果については何ら保証されません。 Sakana AIは、本アプリケーションの使用によって生じた直接的または間接的な損失に対して、結果に関わらず、一切の責任を負いません。 利用者は、本アプリケーションの使用に伴うリスクを十分に理解し、自身の判断で使用することが必要です。
+This project is based on [TinySwallow-ChatUI](https://github.com/SakanaAI/TinySwallow-ChatUI) by [Sakana AI](https://sakana.ai/). Thank you for the excellent foundation.
+
+## License
+
+Apache-2.0
