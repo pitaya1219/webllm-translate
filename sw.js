@@ -1,4 +1,4 @@
-const CACHE_NAME = 'webllm-translate-v4';
+const CACHE_NAME = 'webllm-translate-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -60,12 +60,82 @@ function shouldBypass(url) {
   return false;
 }
 
+// Check if this is a share target request
+function isShareTargetRequest(url) {
+  return url.origin === self.location.origin &&
+         url.pathname === '/' &&
+         (url.searchParams.has('text') || url.searchParams.has('title') || url.searchParams.has('url'));
+}
+
+// Extract shared content from URL
+function extractSharedContent(url) {
+  const text = url.searchParams.get('text') || '';
+  const title = url.searchParams.get('title') || '';
+  const sharedUrl = url.searchParams.get('url') || '';
+
+  let content = text;
+  if (title && !content.includes(title)) {
+    content = title + (content ? '\n\n' + content : '');
+  }
+  if (sharedUrl && !content.includes(sharedUrl)) {
+    content = content + (content ? '\n\n' : '') + sharedUrl;
+  }
+  return content;
+}
+
+// Handle share target by sending to existing client or opening new window
+async function handleShareTarget(url) {
+  const sharedContent = extractSharedContent(url);
+
+  // Try to find an existing client (open tab/window)
+  const clients = await self.clients.matchAll({
+    type: 'window',
+    includeUncontrolled: true
+  });
+
+  // Find a client that's not at the share URL (i.e., already loaded)
+  const existingClient = clients.find(client => {
+    const clientUrl = new URL(client.url);
+    return clientUrl.origin === self.location.origin && !isShareTargetRequest(clientUrl);
+  });
+
+  if (existingClient) {
+    // Send shared content to existing client
+    existingClient.postMessage({
+      type: 'SHARE_TARGET',
+      content: sharedContent
+    });
+    // Focus the existing client
+    await existingClient.focus();
+    // Return a redirect to close the share window/navigate away
+    return Response.redirect('/', 303);
+  }
+
+  // No existing client, let the normal navigation happen
+  // The page will handle shared content via URL params
+  return null;
+}
+
 // Fetch event - cache-first for static assets, bypass for model files
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Let browser handle model downloads directly (bypass service worker)
   if (shouldBypass(url)) {
+    return;
+  }
+
+  // Handle share target requests specially
+  if (isShareTargetRequest(url)) {
+    event.respondWith(
+      handleShareTarget(url).then((response) => {
+        if (response) {
+          return response;
+        }
+        // Fall through to normal page load
+        return caches.match('/') || fetch(event.request);
+      })
+    );
     return;
   }
 

@@ -340,5 +340,28 @@ function applySharedContent() {
   }
 }
 
+// Listen for messages from Service Worker (share target)
+navigator.serviceWorker?.addEventListener('message', (event) => {
+  if (event.data?.type === 'SHARE_TARGET') {
+    const content = event.data.content;
+    console.log('Received shared content from service worker:', content);
+
+    const userInput = document.getElementById("user-input");
+    const chatContainer = document.querySelector(".chat-container");
+
+    // Check if chat is active (model is loaded)
+    if (chatContainer.style.display === 'flex') {
+      // Model is loaded, directly set the input
+      userInput.value = content;
+      userInput.style.height = "24px";
+      userInput.style.height = userInput.scrollHeight + "px";
+      userInput.focus();
+    } else {
+      // Model not loaded yet, store for later
+      sessionStorage.setItem('sharedContent', content);
+    }
+  }
+});
+
 // Check for shared content on page load
 handleSharedContent();
